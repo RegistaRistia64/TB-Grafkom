@@ -1,4 +1,5 @@
-#include <GL/glut.h>
+//Gisa
+#include <GL/glut.h> 
 #include <iostream>
 #include <cmath>
 
@@ -22,8 +23,8 @@ struct CameraPosition {
     float targetY = 0.0f;
     float targetZ = 0.0f;
     float radius = 20.0f; // Camera distance from the target
-    float angleX = 0.0f; // Camera rotation around X axis
-    float angleY = 0.0f; // Camera rotation around Y axis
+    float angle = 0.0f; // Camera rotation angle
+    bool rotate = false; // Status of camera rotation
 } pos;
 
 // Initialize lighting
@@ -40,12 +41,6 @@ void initLighting() {
 
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-}
-
-// Update lighting position (dynamic sun position)
-void updateLighting() {
-    GLfloat lightPosition[] = {10, 10, 0.0f, 1.0f};
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 }
 
 // Draw Cartesian axes
@@ -84,13 +79,13 @@ void drawOctahedron() {
 // Draw solid cube as the floor
 void drawFloor() {
     glPushMatrix();
-    glScalef(10.0f, 3.5f, 10.0f); // Scale cube to make it a floor
+    glScalef(100.0f, 3.5f, 100.0f); // Scale cube to make it a floor
     glTranslated(0,-0.5,0);
     glColor3ub(246,215,176); 
     glutSolidCube(1.0f);
     glPopMatrix();
 }
-
+//wanda
 // Draw tree (coconut tree)
 void drawTree(float x, float z) {
     glPushMatrix();
@@ -116,11 +111,10 @@ void drawTree(float x, float z) {
 
     // Draw coconuts
     glColor3f(0.5f, 0.35f, 0.05f);
-        glPushMatrix();
-        glTranslatef(0.25, 0.6f, 0);
-        glutSolidSphere(0.1f, 20, 20);
-        glPopMatrix();
-    
+    glPushMatrix();
+    glTranslatef(0.25, 0.6f, 0);
+    glutSolidSphere(0.1f, 20, 20);
+    glPopMatrix();
 
     glPopMatrix();
 }
@@ -171,16 +165,20 @@ void drawSun() {
     glutSolidSphere(1.5f, 20, 20);
     glPopMatrix();
 }
-
+//bubu
 // Display callback
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+    // Update camera position based on rotation status
+    pos.camPosX = pos.radius * sin(pos.angle); // X position
+    pos.camPosZ = pos.radius * cos(pos.angle); // Z position
+
     gluLookAt(
-        pos.radius * sin(pos.angleX) * cos(pos.angleY),
-        pos.radius * sin(pos.angleY),
-        pos.radius * cos(pos.angleX) * cos(pos.angleY),
+        pos.camPosX,
+        pos.camPosY,
+        pos.camPosZ,
         pos.targetX, pos.targetY, pos.targetZ,
         0.0, 1.0, 0.0
     );
@@ -223,31 +221,9 @@ void keyboard(unsigned char key, int x, int y) {
         case '-': pos.radius -= 1.0f; break; // Decrease camera radius
         case 'q': cloudScale += 0.1f; break; // Increase cloud scale
         case 'e': cloudScale -= 0.1f; break; // Decrease cloud scale
+        case 't': pos.angle += 0.1f; break; // Rotate camera to the right
+        case 'g': pos.angle -= 0.1f; break; // Rotate camera to the left
     }
-    glutPostRedisplay();
-}
-
-// Mouse motion callback for controlling camera
-void mouseMotion(int x, int y) {
-    static int lastX = -1, lastY = -1;
-    if (lastX == -1) {
-        lastX = x;
-        lastY = y;
-        return;
-    }
-
-    int dx = x - lastX;
-    int dy = y - lastY;
-
-    pos.angleX += dx * 0.01f;
-    pos.angleY -= dy * 0.01f;
-
-    if (pos.angleY > 1.5f) pos.angleY = 1.5f; // Limit vertical rotation
-    if (pos.angleY < -1.5f) pos.angleY = -1.5f;
-
-    lastX = x;
-    lastY = y;
-
     glutPostRedisplay();
 }
 
@@ -262,11 +238,11 @@ void timer(int value) {
 
 // Reshape callback
 void reshape(int w, int h) {
-    glViewport(0, 0, w, h);
+    glViewport(0, 0, w, h); // Set the viewport to the new window dimensions
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, (double)w / (double)h, 1.0, 100.0);
-    glMatrixMode(GL_MODELVIEW);
+    gluPerspective(45.0, (float)w / (float)h, 1.0, 100.0); // Set perspective projection
+    glMatrixMode(GL_MODELVIEW); // Switch back to model view matrix
 }
 
 // Main function
@@ -274,18 +250,16 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(800, 600);
-    glutCreateWindow("3D Octahedron with Cloud, Sun, Floor, and Tree");
+    glutCreateWindow("Kelompok 6 Piramida Mesir Malam Hari");
 
     glEnable(GL_DEPTH_TEST);
     initLighting();
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-    glutPassiveMotionFunc(mouseMotion); // Register mouse motion callback
     glutKeyboardFunc(keyboard); // Register keyboard callback
     glutTimerFunc(0, timer, 0); // Start timer for animations
 
     glutMainLoop();
     return 0;
-}
-
+}.
