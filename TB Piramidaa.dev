@@ -1,20 +1,18 @@
-//Gisa
-#include <GL/glut.h> 
+//GISA
+#include <GL/glut.h>
 #include <iostream>
 #include <cmath>
 
-// Variables for transformations
 float cloudY = 5.0f;
-float cloudScale = 1.0f; // Scale factor for the cloud
-float sunX = 6.0f;
-float sunY = 6.0f;
+float cloudScale = 1.0f;
+float moonX = 6.0f;
+float moonY = 6.0f;
 float rotationAngle = 0.0f;
-float sunRotationAngle = 0.0f;
-bool showAxes = true; // Toggle for Cartesian axes
-float TreeX = 5.0f; // X position of the tree
-float TreeZ = 0.0f; // Z position of the tree
+float moonRotationAngle = 0.0f;
+bool showAxes = true;
+float TreeX = 5.0f;
+float TreeZ = 0.0f;
 
-// Camera position
 struct CameraPosition {
     float camPosX = 0.0f;
     float camPosY = 10.0f;
@@ -22,12 +20,11 @@ struct CameraPosition {
     float targetX = 0.0f;
     float targetY = 0.0f;
     float targetZ = 0.0f;
-    float radius = 20.0f; // Camera distance from the target
-    float angle = 0.0f; // Camera rotation angle
-    bool rotate = false; // Status of camera rotation
+    float radius = 20.0f;
+    float angle = 0.0f;
+    bool rotate = false;
 } pos;
 
-// Initialize lighting
 void initLighting() {
     GLfloat ambientLight[] = {0.2f, 0.2f, 0.2f, 1.0f};
     GLfloat diffuseLight[] = {0.8f, 0.8f, 0.8f, 1.0f};
@@ -43,62 +40,51 @@ void initLighting() {
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 }
 
-// Draw Cartesian axes
 void drawAxes() {
-    if (!showAxes) return; // Skip drawing if axes are hidden
+    if (!showAxes) return;
 
-    glDisable(GL_LIGHTING); // Disable lighting for axes
+    glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-        // X-axis (red)
         glColor3f(1.0f, 1.0f, 1.0f);
         glVertex3f(-10.0f, 0.0f, 0.0f);
         glVertex3f(10.0f, 0.0f, 0.0f);
 
-        // Y-axis (green)
-        glColor3f(1.0f, 1.0f, 1.0f);
         glVertex3f(0.0f, -10.0f, 0.0f);
         glVertex3f(0.0f, 10.0f, 0.0f);
 
-        // Z-axis (blue)
-        glColor3f(1.0f, 1.0f, 1.0f);
         glVertex3f(0.0f, 0.0f, -10.0f);
         glVertex3f(0.0f, 0.0f, 10.0f);
     glEnd();
-    glEnable(GL_LIGHTING); // Re-enable lighting
+    glEnable(GL_LIGHTING);
 }
 
-// Draw octahedron
 void drawOctahedron() {
     glPushMatrix();
-    glScalef(3.2f, 3.2f, 3.2f); // Increase the size of the octahedron
+    glScalef(3.2f, 3.2f, 3.2f);
     glColor3f(1.0f, 0.8f, 0.0f);
     glutSolidOctahedron();
     glPopMatrix();
 }
 
-// Draw solid cube as the floor
 void drawFloor() {
     glPushMatrix();
-    glScalef(100.0f, 3.5f, 100.0f); // Scale cube to make it a floor
-    glTranslated(0,-0.5,0);
-    glColor3ub(246,215,176); 
+    glScalef(13.0f, 3.5f, 13.0f);
+    glTranslated(0, -0.5, 0);
+    glColor3ub(246, 215, 176);
     glutSolidCube(1.0f);
     glPopMatrix();
 }
-//wanda
-// Draw tree (coconut tree)
+//WANDA
 void drawTree(float x, float z) {
     glPushMatrix();
-    glTranslatef(x, 0.55f, z); // Adjust position above the floor
+    glTranslatef(x, 0.55f, z);
 
-    // Draw trunk
     glColor3f(0.55f, 0.27f, 0.07f);
     glPushMatrix();
     glScalef(0.2f, 1.5f, 0.2f);
     glutSolidCube(1.0f);
     glPopMatrix();
 
-    // Draw leaves
     glColor3f(0.0f, 0.8f, 0.0f);
     for (int i = 0; i < 4; i++) {
         glPushMatrix();
@@ -109,7 +95,6 @@ void drawTree(float x, float z) {
         glPopMatrix();
     }
 
-    // Draw coconuts
     glColor3f(0.5f, 0.35f, 0.05f);
     glPushMatrix();
     glTranslatef(0.25, 0.6f, 0);
@@ -119,35 +104,29 @@ void drawTree(float x, float z) {
     glPopMatrix();
 }
 
-// Draw cloud with specific design
 void drawCloud() {
     glPushMatrix();
     glTranslatef(0.0f, cloudY, 0.0f);
-    glScalef(cloudScale, cloudScale, cloudScale); // Apply scale
+    glScalef(cloudScale, cloudScale, cloudScale);
 
-    // Center sphere
     glColor3f(0.8f, 0.8f, 0.8f);
     glutSolidSphere(1.0f, 20, 20);
 
-    // Left sphere
     glPushMatrix();
     glTranslatef(-1.2f, 0.0f, 0.0f);
     glutSolidSphere(0.8f, 20, 20);
     glPopMatrix();
 
-    // Right sphere
     glPushMatrix();
     glTranslatef(1.2f, 0.0f, 0.0f);
     glutSolidSphere(0.8f, 20, 20);
     glPopMatrix();
 
-    // Upper left sphere
     glPushMatrix();
     glTranslatef(-0.8f, 0.6f, 0.0f);
     glutSolidSphere(0.6f, 20, 20);
     glPopMatrix();
 
-    // Upper right sphere
     glPushMatrix();
     glTranslatef(0.8f, 0.6f, 0.0f);
     glutSolidSphere(0.6f, 20, 20);
@@ -156,29 +135,27 @@ void drawCloud() {
     glPopMatrix();
 }
 
-// Draw sun
-void drawSun() {
+void drawMoon() {
     glPushMatrix();
-    glTranslatef(sunX, sunY, 0.0f);
-    glRotatef(sunRotationAngle, 0.0f, 0.0f, 1.0f); // Rotate around its own center
-    glColor3ub(220,220,220);
+    glTranslatef(moonX, moonY, 0.0f);
+    glRotatef(moonRotationAngle, 0.0f, 0.0f, 1.0f);
+    glColor3ub(220, 220, 220);
     glutSolidSphere(1.5f, 20, 20);
     glPopMatrix();
+    
 }
-//bubu
-// Display callback
+
+
+//BUBU
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    // Update camera position based on rotation status
-    pos.camPosX = pos.radius * sin(pos.angle); // X position
-    pos.camPosZ = pos.radius * cos(pos.angle); // Z position
+    pos.camPosX = pos.radius * sin(pos.angle);
+    pos.camPosZ = pos.radius * cos(pos.angle);
 
     gluLookAt(
-        pos.camPosX,
-        pos.camPosY,
-        pos.camPosZ,
+        pos.camPosX, pos.camPosY, pos.camPosZ,
         pos.targetX, pos.targetY, pos.targetZ,
         0.0, 1.0, 0.0
     );
@@ -192,12 +169,9 @@ void display() {
     glPopMatrix();
 
     drawCloud();
-    drawSun();
+    drawMoon();
 
-    // Draw main tree
     drawTree(TreeX, TreeZ);
-
-    // Draw additional trees
     drawTree(-3.0f, -3.0f);
     drawTree(3.0f, -3.0f);
     drawTree(-3.0f, 3.0f);
@@ -206,46 +180,42 @@ void display() {
     glutSwapBuffers();
 }
 
-// Keyboard callback
 void keyboard(unsigned char key, int x, int y) {
     switch (key) {
         case 'w': cloudY += 0.5f; break;
         case 's': cloudY -= 0.5f; break;
         case 'r': rotationAngle += 5.0f; break;
-        case 'x': showAxes = !showAxes; break; // Toggle axes visibility
-        case 'a': TreeX -= 0.5f; break; // Move tree left
-        case 'd': TreeX += 0.5f; break; // Move tree right
-        case 'z': TreeZ -= 0.5f; break; // Move tree forward
-        case 'c': TreeZ += 0.5f; break; // Move tree backward
-        case '+': pos.radius += 1.0f; break; // Increase camera radius
-        case '-': pos.radius -= 1.0f; break; // Decrease camera radius
-        case 'q': cloudScale += 0.1f; break; // Increase cloud scale
-        case 'e': cloudScale -= 0.1f; break; // Decrease cloud scale
-        case 't': pos.angle += 0.1f; break; // Rotate camera to the right
-        case 'g': pos.angle -= 0.1f; break; // Rotate camera to the left
+        case 'x': showAxes = !showAxes; break;
+        case 'a': TreeX -= 0.5f; break;
+        case 'd': TreeX += 0.5f; break;
+        case 'z': TreeZ -= 0.5f; break;
+        case 'c': TreeZ += 0.5f; break;
+        case '+': pos.radius += 1.0f; break;
+        case '-': pos.radius -= 1.0f; break;
+        case 'q': cloudScale += 0.1f; break;
+        case 'e': cloudScale -= 0.1f; break;
+        case 't': pos.angle += 0.1f; break;
+        case 'g': pos.angle -= 0.1f; break;
     }
     glutPostRedisplay();
 }
 
-// Timer callback for animations
 void timer(int value) {
-    sunRotationAngle += 1.0f; // Rotate the sun
-    if (sunRotationAngle >= 360.0f) sunRotationAngle -= 360.0f;
+    moonRotationAngle += 1.0f;
+    if (moonRotationAngle >= 360.0f) moonRotationAngle -= 360.0f;
 
     glutPostRedisplay();
-    glutTimerFunc(16, timer, 0); // Approximately 60 FPS
+    glutTimerFunc(50, timer, 0);
 }
 
-// Reshape callback
 void reshape(int w, int h) {
-    glViewport(0, 0, w, h); // Set the viewport to the new window dimensions
+   
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, (float)w / (float)h, 1.0, 100.0); // Set perspective projection
-    glMatrixMode(GL_MODELVIEW); // Switch back to model view matrix
+    gluPerspective(45.0, (float)w / (float)h, 1.0, 100.0);
+    glMatrixMode(GL_MODELVIEW);
 }
 
-// Main function
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -257,9 +227,9 @@ int main(int argc, char** argv) {
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-    glutKeyboardFunc(keyboard); // Register keyboard callback
-    glutTimerFunc(0, timer, 0); // Start timer for animations
+    glutKeyboardFunc(keyboard);
+    glutTimerFunc(0, timer, 0);
 
     glutMainLoop();
     return 0;
-}.
+}
